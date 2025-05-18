@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Вгадай переклад — Каос</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e1e;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    .quiz-container {
+      max-width: 600px;
+      background: #2c2c2c;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+    }
+    .quote {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+    }
+    .options button:hover {
+      background-color: #666;
+    }
+    #nextBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #result {
+      font-size: 24px;
+      margin-top: 20px;
+      color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧠 Вгадай переклад</h1>
+  <div class="quiz-container">
+    <div id="quote" class="quote"></div>
+    <div class="options" id="options"></div>
+    <button id="nextBtn" onclick="nextQuestion()" style="display:none;">Наступне питання</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        quote: "You think you're the first god to be bored?",
+        correct: 'Ти думаєш, ти перший бог, якому нудно?',
+        options: ['Ти думаєш, ти перший бог, якому нудно?',
+                  'Ти не перший смертний, якому нудно.',
+                  'Ти що, бог, якому вперше весело?']
+      },
+      {
+        quote: "Don't smite me, mighty Zeus!",
+        correct: 'Не бий мене, всемогутній Зевсе!',
+        options: ['Не бий мене, всемогутній Зевсе!',
+                  'Не дратуйся, Зевсе, ти ж головний.',
+                  'Не карай мене, пане Зевсе!']
+      },
+      {
+        quote: "It’s not a crown, it’s a burden.",
+        correct: 'Це не корона, це тягар.',
+        options: ['Це не корона, це тягар.',
+                  'Це не шапка — це біда.',
+                  'Це не влада — це вирок.']
+      },
+      {
+        quote: "You dare question the will of Olympus?",
+        correct: 'Ти насмілився ставити під сумнів волю Олімпу?',
+        options: ['Ти насмілився ставити під сумнів волю Олімпу?',
+                  'Ти сумніваєшся в богах?',
+                  'Ти проти Олімпу, смертний?']
+      },
+      {
+        quote: "The prophecy must be fulfilled.",
+        correct: 'Пророцтво має здійснитися.',
+        options: ['Пророцтво має здійснитися.',
+                  'Все має йти за планом.',
+                  'Ми маємо дотриматись обіцянки.']
+      },
+      {
+        quote: "He's just a pawn in their game.",
+        correct: 'Він лише пішак у їхній грі.',
+        options: ['Він лише пішак у їхній грі.',
+                  'Він частина великої картини.',
+                  'Він теж грає свою роль.']
+      },
+      {
+        quote: "Even gods fear what they don't understand.",
+        correct: 'Навіть боги бояться того, чого не розуміють.',
+        options: ['Навіть боги бояться того, чого не розуміють.',
+                  'Боги не всесильні — вони теж бояться.',
+                  'Все, що невідоме — страшне навіть богам.']
+      },
+      {
+        quote: "You have the power to change fate.",
+        correct: 'У тебе є сила змінити долю.',
+        options: ['У тебе є сила змінити долю.',
+                  'Доля в твоїх руках.',
+                  'Можна спробувати змінити свою історію.']
+      },
+      {
+        quote: "I am not your puppet, Hades.",
+        correct: 'Я не твоя маріонетка, Гадесе.',
+        options: ['Я не твоя маріонетка, Гадесе.',
+                  'Я більше не слухаю тебе, Гадесе.',
+                  'Я не підкорююсь, бог смерті!']
+      },
+      {
+        quote: "Chaos is not destruction. It's creation.",
+        correct: 'Хаос — це не руйнування. Це творення.',
+        options: ['Хаос — це не руйнування. Це творення.',
+                  'Хаос — це шлях до знищення.',
+                  'Без хаосу не було б порядку.']
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    function loadQuestion() {
+      document.getElementById('result').innerHTML = '';
+      document.getElementById('nextBtn').style.display = 'none';
+      const q = questions[current];
+      document.getElementById('quote').innerText = `«${q.quote}»`;
+      const opts = document.getElementById('options');
+      opts.innerHTML = '';
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(opt, btn);
+        opts.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected, button) {
+      const correct = questions[current].correct;
+      const buttons = document.querySelectorAll('.options button');
+      buttons.forEach(btn => btn.disabled = true);
+      if (selected === correct) {
+        button.style.backgroundColor = 'green';
+        score++;
+      } else {
+        button.style.backgroundColor = 'crimson';
+        buttons.forEach(btn => {
+          if (btn.innerText === correct) btn.style.backgroundColor = 'green';
+        });
+      }
+      document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current < questions.length) {
+        loadQuestion();
+      } else {
+        document.querySelector('.quiz-container').innerHTML = `
+          <h2>✅ Ви завершили гру!</h2>
+          <p id="result">Результат: ${score} з ${questions.length} правильних.</p>
+        `;
+      }
+    }
+
+    loadQuestion();
+  </script>
+
+</body>
+</html>
